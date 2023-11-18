@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
-using System.Numerics;
 
 public enum AbonentType
 {
@@ -12,11 +10,11 @@ public enum AbonentType
 
 public struct Abonent
 {
-    public int accountNumber;
+    public int? accountNumber;
     public string fullName;
     public string address;
     public string phoneNumber;
-    public int contractNumber;
+    public int? contractNumber;
     public DateTime DateOfConclusionOfTheAgreement;
     public bool AvailabilityOfBenefits;
     public AbonentType typeOfAbonent;
@@ -128,14 +126,14 @@ class Program
     {
         Abonent result = abonents.Find(abonent => abonent.contractNumber == contractNumber);
 
-        if (result.Equals(default(Abonent)))
-        {
-            Console.WriteLine("Абонент з таким номером договору не знайдений.");
-        }
-        else
+        if (result.accountNumber.HasValue)
         {
             Console.WriteLine("Результат пошуку за номером договору:");
             PrintAbonentInfo(result);
+        }
+        else
+        {
+            Console.WriteLine("Абонент з таким номером договору не знайдений.");
         }
     }
 
@@ -194,7 +192,7 @@ class Program
         Abonent abonent = new Abonent();
 
         Console.Write("Номер рахунку: ");
-        abonent.accountNumber = int.Parse(Console.ReadLine());
+        abonent.accountNumber = int.TryParse(Console.ReadLine(), out int accNum) ? (int?)accNum : null;
 
         Console.Write("ПІП абонента: ");
         abonent.fullName = Console.ReadLine();
@@ -206,12 +204,12 @@ class Program
         abonent.phoneNumber = Console.ReadLine();
 
         Console.Write("Номер договору: ");
-        abonent.contractNumber = int.Parse(Console.ReadLine());
+        abonent.contractNumber = int.TryParse(Console.ReadLine(), out int contractNum) ? (int?)contractNum : null;
 
         Console.Write("Дата укладення договору (yyyy-MM-dd): ");
-        if (DateTime.TryParseExact(Console.ReadLine(), "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out DateTime дата))
+        if (DateTime.TryParseExact(Console.ReadLine(), "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out DateTime date))
         {
-            abonent.DateOfConclusionOfTheAgreement = дата;
+            abonent.DateOfConclusionOfTheAgreement = date;
         }
         else
         {
@@ -220,9 +218,9 @@ class Program
         }
 
         Console.Write("Наявність пільг (true/false): ");
-        if (bool.TryParse(Console.ReadLine(), out bool AvailabilityOfBenefits))
+        if (bool.TryParse(Console.ReadLine(), out bool benefits))
         {
-            abonent.AvailabilityOfBenefits = AvailabilityOfBenefits;
+            abonent.AvailabilityOfBenefits = benefits;
         }
         else
         {
@@ -262,11 +260,11 @@ class Program
                 {
                     Abonent abonent = new Abonent
                     {
-                        accountNumber = int.Parse(values[0]),
+                        accountNumber = int.TryParse(values[0], out int accNum) ? (int?)accNum : null,
                         fullName = values[1],
                         address = values[2],
                         phoneNumber = values[3],
-                        contractNumber = int.Parse(values[4]),
+                        contractNumber = int.TryParse(values[4], out int contractNum) ? (int?)contractNum : null,
                         DateOfConclusionOfTheAgreement = DateTime.ParseExact(values[5], "yyyy-MM-dd", null),
                         AvailabilityOfBenefits = bool.Parse(values[6]),
                         typeOfAbonent = (AbonentType)Enum.Parse(typeof(AbonentType), values[7]),
@@ -299,4 +297,3 @@ class Program
         }
     }
 }
-
